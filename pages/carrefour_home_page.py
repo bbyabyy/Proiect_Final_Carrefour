@@ -1,45 +1,50 @@
-from basepage import Base_page
+from selenium.webdriver.support.wait import WebDriverWait
+from base_page import Base_page
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
 
 
-class Home_page(Base_page):
+class HomePage(Base_page):
 
+    HOMEPAGE = "https://www.carrefour.ro/"
     SEARCH_BOX = (By.ID, "search")
-    SEARCH_BUTTON = (By.CLASS_NAME, "form-submit")
-    SEARCH_RESULTS = (By.XPATH, '//h1[@class="page-title"]')
-    LOGIN_BUTTON = (By.XPATH, '//a[@role="button" and @title="Log in / Register"]')
+    SEARCH_BUTTON = (By.XPATH, '//button[@class="form-submit"]')
+    SEARCH_RESULTS = (By.XPATH, '//span[@class="base"]/span')
+    LOGIN_BUTTON = (By.XPATH, '//a[@title="login"]')
+    MY_BASKET_BUTTON = (By.XPATH, '//a[@role="button" and @title="minicart"]')
     CAREERS_LINK = (By.XPATH, '//a[@href= "/corporate/cariere" and @title="Cariere">Ca]')
-    ADD_TO_BASKET = (By.XPATH, '//button[@data-id="33524051"]')
-
-    def __init__(self):
-        self.chrome = None
+    ADD_TO_SHOPPING_CART_BUTTON = (By.XPATH,'//ol[@class="products list"]/li[1]//button[@type="submit"]')
 
     def navigate_to_homepage(self):
-        self.chrome.get("https://www.carrefour.ro/")
+        self.chrome.get(self.HOMEPAGE)
 
     def insert_search_value(self, product_name):
         self.chrome.find_element(*self.SEARCH_BOX).send_keys(product_name)
 
-    def click_on_search_button(self):
-        self.chrome.find_element(*self.SEARCH_BUTTON).click()
-
-    def check_search_results(self, results_number):
-        no_results = self.chrome.find_element(*self.SEARCH_RESULTS).text()
-        result = no_results.replace(",", "")
-        assert int(result) >= int(results_number), (f"ERROR: Results Number is incorrect. EXPECTED: "
-                                                    f"{results_number}, ACTUAL {result}")
-
-    def insert_the_search_value(self):
-        self.chrome.find_element(*self.SEARCH_BOX).send_keys("cafea boabe")
-
     def click_search_button(self):
         self.chrome.find_element(*self.SEARCH_BUTTON).click()
 
-    def add_to_bascket_button(self):
-        self.chrome.find_element(*self.ADD_TO_BASKET).click()
+    def check_search_results(self, results_number):
+        no_results = self.chrome.find_element(*self.SEARCH_RESULTS).text
+        result = no_results[:no_results.index(" ")]
+        assert int(result) >= int(results_number), f"ERROR: Results Number is incorrect. EXPECTED: {results_number}, ACTUAL {result}"
 
     def click_on_login_button(self):
         self.chrome.find_element(*self.LOGIN_BUTTON).click()
 
+    def click_my_basket_button(self):
+        self.chrome.find_element(*self.MY_BASKET_BUTTON).click()
+
     def click_on_carers_link(self):
         self.chrome.find_element(*self.CAREERS_LINK).click()
+
+    def click_account_button(self):
+        self.chrome.find_element(*self.LOGIN_BUTTON).click()
+
+    def navigate_to_login_page(self):
+        current_url = self.chrome.current_url
+        assert "login" in current_url, f"Error: expected url to contain login. Actual URL: {current_url}"
+
+    def add_product_to_shopping_cart(self):
+        cart_button = WebDriverWait(self.chrome, 50).until(EC.element_to_be_clickable(self.ADD_TO_SHOPPING_CART_BUTTON))
+        cart_button.click()

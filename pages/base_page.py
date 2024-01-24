@@ -5,13 +5,11 @@ from selenium.webdriver.support import expected_conditions as EC
 
 
 class Base_page(Browser):
-
-    COOKIES_BUTTON = (By.ID, "html-body")
+    COOKIES_BUTTON = (By.ID, "onetrust-accept-btn-handler")
 
     def accept_cookies(self):
         try:
             self.chrome.find_element(*self.COOKIES_BUTTON).click()
-
         except:
             pass
 

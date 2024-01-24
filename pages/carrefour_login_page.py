@@ -1,31 +1,26 @@
-from basepage import Base_page
+from time import sleep
+from base_page import Base_page
 from selenium.webdriver.common.by import By
-
 
 class Login_page(Base_page):
 
     LOGIN_PAGE = "https://www.carrefour.ro/customer/account/login"
-    EMAIL_ADDRESS = (By.ID, "credentials")
-    PASSWORD = (By.ID, "pass")
-    ENTER_THE_ACCOUNT = (By.ID, "send2")
-    MY_ACCOUNT = (By.XPATH, '//span[@class="base" and @data-ui-id="page-title-wrapper"]')
+    EMAIL_ADDRESS = (By.XPATH, '//input[@name="login[credentials]"]')
+    PASSWORD = (By.XPATH,'//input[@name="login[password]"]')
+    LOGIN_BUTTON = (By.ID, "send2")
 
-    def __init__(self):
-        self.chrome = None
+    def navigate_to_loginpage(self):
+        self.chrome.get(*self.LOGIN_PAGE)
 
-    def navigate_to_homepage(self):
-        self.chrome.get(self.LOGIN_PAGE)
-
-    def insert_username(self, username):
-        username = "contul.meu20@yahoo.com"
+    def enter_any_username(self,username):
         self.chrome.find_element(*self.EMAIL_ADDRESS).send_keys(username)
 
-    def insert_password(self, password):
-        password = "_A#YcveC*Mrds5Q"
+    def enter_any_password(self,password):
         self.chrome.find_element(*self.PASSWORD).send_keys(password)
 
-    def click_on_enter(self):
-        self.chrome.find_element(*self.ENTER_THE_ACCOUNT).click()
+    def click_on_login_button(self):
+        self.chrome.find_element(*self.LOGIN_BUTTON).click()
 
-    def open_account_page(self):
-        self.chrome.find_element(*self.MY_ACCOUNT)
+    def login_succesfuly(self):
+        current_url = self.chrome.current_url
+        assert "customer/account" in current_url, f"Error: expected url to contain customer/account. Actual url: {current_url}"
